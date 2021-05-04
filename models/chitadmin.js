@@ -10,6 +10,9 @@ var adminschema = mongoose.Schema({
     },
     numberofchits:{
         type:Number
+    },
+    role:{
+        type:String
     }
     
 });

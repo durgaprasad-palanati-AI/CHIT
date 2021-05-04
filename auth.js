@@ -1,12 +1,15 @@
 const jwt = require('jsonwebtoken');
 //let nope = process.env.AUTH_SECRET;
-let nope='durgabooks123';
+let nope='durgachitss123';
 
 class Authentication{
     createToken(payload){
         let jwtOptions = { expiresIn: 60*60*12, algorithm: "HS256" };
+        console.log("payload in ctoken is",payload)
+        
         let token = jwt.sign( payload, nope, jwtOptions );
-        //console.log(payload)
+        
+        
         return token;
     };
     
@@ -20,9 +23,9 @@ class Authentication{
             //console.log("verify=",verify)
             if(verify){
                 let decoded = jwt.decode(token);
-                //console.log("decoded=",decoded)
-                //req.headers.username=decoded.username
-                //console.log("header decoded=",req.headers.username)
+                //console.log("decoded is=",decoded)
+                req.headers.role=decoded.role
+                
                 next()
             }
         }catch(err){

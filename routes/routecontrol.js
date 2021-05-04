@@ -10,12 +10,13 @@ const authentication = new Authentication();
 
 
 exports.loggin=async function (req, res) {
-    const { username, password } = req.body;
-    const users = await userschema.findOne({username:username,password:password});
+    const { username, password,role } = req.body;
+    const users = await userschema.findOne({username:username,password:password,role:role});
     if (users){
         let payloadToCreateToken = {
             username:username,
-            password:password
+            password:password,
+            role:role
           };
         let accessToken=authentication.createToken(payloadToCreateToken);
         res.json({
@@ -67,12 +68,19 @@ exports.viewallchits=function (req, res) {
 //create chits
 exports.createchit= async function (req, res) {
     try
-    { 
+    { //console.log("req role is=",req.headers.role)
+        const role  = req.headers.role;
+
+        if(role=='owner')
+        {
         const newchit = req.body;
         //console.log(newchit)
         chitschema.create(newchit);
         res.json({message:"success chit inserted",data:newchit})
-     
+        }
+        else{
+            res.json({message:"no job for u here"})
+        }
      }catch(err)
      {
      console.log(err)
@@ -83,9 +91,11 @@ exports.createchit= async function (req, res) {
 exports.updatechit =async function (req, res) {
     try
     { const {chitname,chitvalue}=req.body
+    const role  = req.headers.role;
+    if(role=='owner'){
      let chit= await  chitschema.find({chitname:chitname})
      //console.log("found chit",chit)
-    if(!chit)
+    if(!chit.length)
     {
         res.json({message:"no chit found with given:"+chitname})
     }
@@ -95,7 +105,9 @@ exports.updatechit =async function (req, res) {
          let chit= await  chitschema.find({chitname:chitname})
          res.json({payload:req.body,message:"success update",data:chit})
     }
- 
+ }else{
+    res.json({message:"no job for u here"})
+}
      }catch(err)
      {
      console.log(err)
@@ -106,9 +118,11 @@ exports.updatechit =async function (req, res) {
  exports.deletechit =async function (req, res) {
     try
     { const {chitname}=req.body
+    const role  = req.headers.role;
+    if(role=='owner'){
      let chit= await  chitschema.find({chitname:chitname})
      //console.log("found chit",chit)
-    if(!chit)
+    if(!chit.length)
     {
         res.json({message:"no chit found with given:"+chitname})
     }
@@ -117,7 +131,9 @@ exports.updatechit =async function (req, res) {
          //let chit= await  chitschema.find({chitname:chitname})
          res.json({payload:req.body,message:"deletion success"})
     }
- 
+ }else{
+    res.json({message:"no job for u here"})
+}
      }catch(err)
      {
      console.log(err)
