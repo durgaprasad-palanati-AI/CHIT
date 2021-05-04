@@ -1,5 +1,6 @@
 var express = require('express')
 var app = express()
+const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');//new
 userschema=require('../models/chitadmin')
 chitschema=require('../models/newchit')
@@ -47,6 +48,7 @@ exports.viewmembers=function (req, res) {
 };
 //view chits
 exports.viewallchits=function (req, res) {
+    
     chitschema.get(function (err, chits) {
         if (err) {
             res.json({
