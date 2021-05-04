@@ -1,5 +1,8 @@
 var mongoose = require('mongoose');// Setup schema
 var chitschema = mongoose.Schema({
+    chitname:{
+        type:String
+    },
 
     chitsize: {
         type:Number
@@ -16,13 +19,12 @@ var chitschema = mongoose.Schema({
     chitmonthsmore:{
         type:Number
     },
-    chitpayments:{
-        type:Array
+    chitstarted:{
+        type:Date
     }
-    
 });
 // Export user model
-var adminuser = module.exports = mongoose.model('chitadmin', adminschema,'chitadmin');
+var chits = module.exports = mongoose.model('newchit', chitschema,'newchit');
 module.exports.get = function (callback, limit) {
-    adminuser.find(callback).limit(limit);
+    chits.find(callback).limit(limit);
 }
