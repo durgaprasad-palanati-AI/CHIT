@@ -7,6 +7,7 @@ chitschema=require('../models/newchit')
 memberschema=require('../models/member')
 const Authentication = require("../auth");
 const authentication = new Authentication();
+var moment = require('moment');
 
 
 exports.loggin=async function (req, res) {
@@ -75,8 +76,15 @@ exports.createchit= async function (req, res) {
         {
         const newchit = req.body;
         //console.log(newchit)
+        //console.log(newchit.chitname,newchit.chitvalue)
         chitschema.create(newchit);
-        res.json({message:"success chit inserted",data:newchit})
+        cstime=moment().format("DD-MM-YYYY")
+        cetime=moment().add(newchit.chitperiod, 'M').subtract(1,'d').format('DD-MM-YYYY');
+        let updatedchit = await chitschema.findOneAndUpdate({chitname:newchit.chitname},
+            {$set: {chitstarted:cstime},$set: {chitendson:cetime}})
+            //,chitendson:"$chitstarted".getMonth()+newchit.chitperiod,chitmonth: { $subtract: ["$chitendson", "$chitstarted" ] },chitmonthsmore:{ $subtract: ["$chitperiod","$chitmonth"] }
+            let chit= await  chitschema.find({chitname:newchit.chitname})
+            res.json({message:"success chit inserted",data:chit})
         }
         else{
             res.json({message:"no job for u here"})

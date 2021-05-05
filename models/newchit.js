@@ -20,6 +20,9 @@ var chitschema = mongoose.Schema({
         type:Number
     },
     chitstarted:{
+        type:String
+    },
+    chitendson:{
         type:Date
     }
 });
