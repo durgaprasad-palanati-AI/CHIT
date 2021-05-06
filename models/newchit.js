@@ -28,7 +28,13 @@ var chitschema = mongoose.Schema({
         type:String
     },
     chitmembers:
-        [{ type: Object, ref: 'member' }]
+        [{ type: Object, ref: 'member' }],
+    presentnumberofmembers:{
+        type:Number
+    },
+    numberofmemberscanbeadded:{
+        type:Number
+    }
 });
 // Export user model
 var chits = module.exports = mongoose.model('newchit', chitschema,'newchit');

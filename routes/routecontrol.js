@@ -32,7 +32,7 @@ exports.loggin=async function (req, res) {
 //create members
 exports.createmembers= async function (req, res) {
     try
-    { //console.log("req role is=",req.headers.role)
+    { 
         const role  = req.headers.role;
 
         if(role=='owner')
@@ -156,14 +156,37 @@ exports.updatechit =async function (req, res) {
             res.json({message:"no members found with given:"+chitmems})
          }
          else
-         {
+         {  //add member to chit
+            let chit= await  chitschema.findOne({chitname:chitname})
+            //console.log("chit size=",chit.chitsize)
+            more=chit.chitsize-vmembs.length
             let updatedchit = await chitschema.findOneAndUpdate({chitname:chitname},
-            {$set: {chitvalue: chitvalue,chitmonthsmore: cmore,chitmembers:vmembs}})
-            let chit= await  chitschema.find({chitname:chitname})
+            {$set: {chitvalue: chitvalue,chitmonthsmore: cmore,chitmembers:vmembs,
+                presentnumberofmembers:vmembs.length,
+                numberofmemberscanbeadded:more}})
+            
             
             let difference = chitmems.filter(x => !membs.includes(x));
-            
+            //add chit to member
+            for(let i = 0, l = membs.length; i < l; i++) 
+            { 
+            let updatedmember = await memberschema.findOneAndUpdate({memid:membs[i]},
+                {$push: {inthesechits:chitname}})
+             }
+             /*await memberschema.aggregate([{$project:
+            {innumberofchits:{$size:"$inthesechits"}}}])
+            */
+            const updatedmember2=memberschema.find().cursor();
+            for (let doc = await updatedmember2.next(); doc != null; doc = await updatedmember2.next()) {
+                //console.log("doc is=",doc.inthesechits,doc.inthesechits.length)
+                let updatedmember3 = await memberschema.findOneAndUpdate({memid:doc.memid},
+                    {$set: {innumberofchits:doc.inthesechits.length}})
+                
+            }
+           //console.log("inthesechits2",updatedmember2,typeof updatedmember2)
+             
             res.json({payload:req.body,message:"success update",notmembers:difference,data:chit})
+            
         }
     }     
  }else{
