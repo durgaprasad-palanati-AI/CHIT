@@ -7,8 +7,9 @@ chitschema=require('../models/newchit')
 memberschema=require('../models/member')
 const Authentication = require("../auth");
 const authentication = new Authentication();
+const ddiff = require("./datediffunction");
+const ddif = new ddiff();
 var moment = require('moment');
-
 
 exports.loggin=async function (req, res) {
     const { username, password,role } = req.body;
@@ -78,11 +79,11 @@ exports.createchit= async function (req, res) {
         //console.log(newchit)
         //console.log(newchit.chitname,newchit.chitvalue)
         chitschema.create(newchit);
-        cstime=moment().format("DD-MM-YYYY")
-        cetime=moment().add(newchit.chitperiod, 'M').subtract(1,'d').format('DD-MM-YYYY');
+        var cstime=moment().format("DD-MM-YYYY")
+        var cetime=moment().add(newchit.chitperiod, 'M').subtract(1,'d').format('DD-MM-YYYY');
         let updatedchit = await chitschema.findOneAndUpdate({chitname:newchit.chitname},
-            {$set: {chitstarted:cstime},$set: {chitendson:cetime}})
-            //,chitendson:"$chitstarted".getMonth()+newchit.chitperiod,chitmonth: { $subtract: ["$chitendson", "$chitstarted" ] },chitmonthsmore:{ $subtract: ["$chitperiod","$chitmonth"] }
+            {$set: {chitstarted:cstime,chitendson:cetime}})
+            
             let chit= await  chitschema.find({chitname:newchit.chitname})
             res.json({message:"success chit inserted",data:chit})
         }
@@ -101,15 +102,20 @@ exports.updatechit =async function (req, res) {
     { const {chitname,chitvalue}=req.body
     const role  = req.headers.role;
     if(role=='owner'){
-     let chit= await  chitschema.find({chitname:chitname})
+     chit= await chitschema.find({chitname:chitname})
      //console.log("found chit",chit)
     if(!chit.length)
     {
         res.json({message:"no chit found with given:"+chitname})
     }
     else{
+        //console.log('from chit',chit)
+        chito= await chitschema.findOne({chitname:chitname})
+        //console.log('from chischema',chito.chitstarted,chito.chitendson)
+        var curtime=moment().format("DD-MM-YYYY")
+        let cmore=ddif.moretime(curtime,chito.chitendson)
      let updatedchit = await chitschema.findOneAndUpdate({chitname:chitname},
-         {$set: {chitvalue: chitvalue}})
+         {$set: {chitvalue: chitvalue,chitmonthsmore: cmore}})
          let chit= await  chitschema.find({chitname:chitname})
          res.json({payload:req.body,message:"success update",data:chit})
     }

@@ -23,7 +23,7 @@ var chitschema = mongoose.Schema({
         type:String
     },
     chitendson:{
-        type:Date
+        type:String
     }
 });
 // Export user model
