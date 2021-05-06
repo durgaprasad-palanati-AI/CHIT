@@ -1,5 +1,7 @@
+const { ObjectID } = require('bson');
 var mongoose = require('mongoose');// Setup schema
 const Schema = mongoose.Schema;
+const newchit=require('./newchit');
 var memberschema = mongoose.Schema({
 
     membername: {
@@ -7,10 +9,13 @@ var memberschema = mongoose.Schema({
         required: true
     },
     inthesechits:
-        [{ type: Schema.Types.ObjectId, ref: 'newchit' }]
+        [{ type: Object, ref: 'newchit' }]
     ,
     innumberofchits:{
         type:Number
+    },
+    memid:{
+        type:String
     }
     
 });

@@ -29,6 +29,28 @@ exports.loggin=async function (req, res) {
         res.send('Username or password incorrect');
     }
 };
+//create members
+exports.createmembers= async function (req, res) {
+    try
+    { //console.log("req role is=",req.headers.role)
+        const role  = req.headers.role;
+
+        if(role=='owner')
+        {
+        const newmember = req.body;
+
+        memberschema.create(newmember);
+        res.json({message:"success member created",data:newmember})
+        }
+        else{
+            res.json({message:"no job for u here"})
+        }
+     }catch(err)
+     {
+     console.log(err)
+     res.json({message:"internal error"})
+     }
+};
 //view members
 exports.viewmembers=function (req, res) {
     
@@ -99,7 +121,7 @@ exports.createchit= async function (req, res) {
 //update chit
 exports.updatechit =async function (req, res) {
     try
-    { const {chitname,chitvalue}=req.body
+    { const {chitname,chitvalue,chitmems}=req.body
     const role  = req.headers.role;
     if(role=='owner'){
      chit= await chitschema.find({chitname:chitname})
@@ -108,17 +130,42 @@ exports.updatechit =async function (req, res) {
     {
         res.json({message:"no chit found with given:"+chitname})
     }
-    else{
-        //console.log('from chit',chit)
+    else
+    {
+        
         chito= await chitschema.findOne({chitname:chitname})
-        //console.log('from chischema',chito.chitstarted,chito.chitendson)
         var curtime=moment().format("DD-MM-YYYY")
         let cmore=ddif.moretime(curtime,chito.chitendson)
-     let updatedchit = await chitschema.findOneAndUpdate({chitname:chitname},
-         {$set: {chitvalue: chitvalue,chitmonthsmore: cmore}})
-         let chit= await  chitschema.find({chitname:chitname})
-         res.json({payload:req.body,message:"success update",data:chit})
-    }
+        var membs=[]
+        var vmembs=[]
+        for(let i = 0, l = chitmems.length; i < l; i++) 
+        {
+            mems=await memberschema.findOne({memid:chitmems[i]},{membername:1,memid:1})
+           
+             if(!mems)
+            {
+            // 
+             }
+            else{
+             membs.push(mems.memid)
+             vmembs.push(mems)
+             }
+        }
+         if(!vmembs.length)
+         {
+            res.json({message:"no members found with given:"+chitmems})
+         }
+         else
+         {
+            let updatedchit = await chitschema.findOneAndUpdate({chitname:chitname},
+            {$set: {chitvalue: chitvalue,chitmonthsmore: cmore,chitmembers:vmembs}})
+            let chit= await  chitschema.find({chitname:chitname})
+            
+            let difference = chitmems.filter(x => !membs.includes(x));
+            
+            res.json({payload:req.body,message:"success update",notmembers:difference,data:chit})
+        }
+    }     
  }else{
     res.json({message:"no job for u here"})
 }
