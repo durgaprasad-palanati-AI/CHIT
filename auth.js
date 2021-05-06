@@ -4,8 +4,8 @@ let nope='durgachitss123';
 
 class Authentication{
     createToken(payload){
-        let jwtOptions = { expiresIn: 60*60*12, algorithm: "HS256" };
-        console.log("payload in ctoken is",payload)
+        let jwtOptions = { expiresIn: 60*60, algorithm: "HS256" };
+        //console.log("payload in ctoken is",payload)
         
         let token = jwt.sign( payload, nope, jwtOptions );
         
