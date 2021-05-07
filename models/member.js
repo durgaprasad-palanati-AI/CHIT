@@ -14,6 +14,11 @@ var memberschema = mongoose.Schema({
     innumberofchits:{
         type:Number
     },
+    liftedchits:
+        [{ type: Object, ref: 'newchit' }]
+    ,
+    paidchits:
+        [{ type: Object, ref: 'newchit' }],
     memid:{
         type:String
     }
