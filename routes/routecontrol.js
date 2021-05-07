@@ -197,8 +197,9 @@ exports.updatechit =async function (req, res) {
                 //console.log("doc is=",doc.inthesechits,doc.inthesechits.length)
                 let updatedmember3 = await memberschema.findOneAndUpdate({memid:doc.memid},
                     {$set: {innumberofchits:doc.inthesechits.length}})  
-            }     
-            res.json({payload:req.body,message:"success update",notmembers:difference,data:chit})
+            } 
+            let chitu= await  chitschema.findOne({chitname:chitname})  
+            res.json({payload:req.body,message:"success update",notmembers:difference,data:chitu})
             }
     }     
  }else{
@@ -228,9 +229,16 @@ exports.updatechitpayments =async function (req, res) {
     else
     {   
         let chitmember2=await chitschema.findOne({chitname:chitname})
-        console.log("chitmember2",chitmember2.chitmembers)
+       
        vchitmembers=chitmember2.chitmembers
-       let vmembs = chitpaidby.filter(x => !vchitmembers.includes(x));
+       var vchitmembs=[]
+       for(let i=0;i<vchitmembers.length;i++)
+       {
+        vchitmembs.push(vchitmembers[i].memid)
+       }
+       
+       let vmembs = vchitmembs.filter(x => chitpaidby.includes(x));
+       //console.log("chit paid vmebs",vmembs)
         if(!vmembs.length)
             { 
             res.json({message:"these members not allowedto pay:"+chitliftedby})
@@ -242,12 +250,15 @@ exports.updatechitpayments =async function (req, res) {
             }
         
     }  
-    chit= await chitschema.find({chitname:chitname})
+    
     for (i=0;i<chitpaidby.length;i++){
     let updatedmember3 = await memberschema.findOneAndUpdate({memid:chitpaidby[i]},
         {$set: {paidchits:chit}})}
-    res.json({payload:req.body,message:"chit payments success update"})  
- }  else{res.json({message:"no job for u here"})}
+        chit= await chitschema.find({chitname:chitname})
+ res.json({payload:req.body,message:"chit payments success update",data:chit})
+    }
+   
+  else{res.json({message:"no job for u here"})}
      }
      catch(err)
      {
@@ -309,8 +320,30 @@ exports.updateliftedchit =async function (req, res) {
     }
     else{
       await chitschema.findOneAndDelete({chitname:chitname})
-         //let chit= await  chitschema.find({chitname:chitname})
-         res.json({payload:req.body,message:"deletion success"})
+         
+      //DELETE CHIT FROM MEMBERS WHO ARE HOLDING IT
+        const dmembs=[]//to delete deleted chit from these mebers
+      const updatedmember4=memberschema.find().cursor();
+            for (let doc = await updatedmember4.next(); doc != null; doc = await updatedmember4.next())
+             {
+                if (doc.inthesechits.includes(chitname)){
+                //console.log("doc is=",doc.inthesechits,doc.memid,doc.inthesechits.length)
+                dmembs.push(doc.memid)
+                }
+            } 
+            //console.log("dmembs is=",dmembs)
+        for(let i=0;i<dmembs.length;i++){
+            
+            //console.log("dmebs is=",dmembs[i])
+            const holdingchit=await memberschema.findOne({memid:dmembs[i]});
+            const holdingchits=holdingchit.inthesechits
+            //console.log("holdingchits inthese",holdingchits)
+            var delchitindex=holdingchits.indexOf(chitname)
+            holdingchits.splice(delchitindex,1)
+            let updatedmember5 = await memberschema.findOneAndUpdate({memid:dmembs[i]},
+                {$set: {inthesechits:holdingchits,innumberofchits:holdingchits.length}})
+        } 
+        res.json({payload:req.body,message:"success delete",chitname:chitname,deletedfrom:dmembs})  
     }
  }else{
     res.json({message:"no job for u here"})

@@ -1,0 +1,212 @@
+{
+    "status": "success",
+    "message": "chits retrieved successfully",
+    "data": [
+        {
+            "chitmembers": [
+                {
+                    "_id": "60912b3a86f5a57b478e6530",
+                    "membername": "mem_AAA",
+                    "memid": "mem_1"
+                },
+                {
+                    "_id": "6093919b14c7fbddf6badd30",
+                    "membername": "mem_BBB",
+                    "memid": "mem_2"
+                },
+                {
+                    "_id": "6093a3af4b9fe11eb81a7533",
+                    "membername": "mem_CCC",
+                    "memid": "mem_3"
+                }
+            ],
+            "chitliftedby": [
+                {
+                    "inthesechits": [
+                        "chit9",
+                        "chit10",
+                        "chit11",
+                        "chit13"
+                    ],
+                    "liftedchits": [],
+                    "_id": "60912b3a86f5a57b478e6530",
+                    "membername": "mem_AAA",
+                    "memid": "mem_1",
+                    "innumberofchits": 4
+                }
+            ],
+            "chitpaidby": [
+                "mem_1",
+                "mem_2",
+                "mem_3"
+            ],
+            "chitnotpaidby": [],
+            "_id": "60937cbe9a75d92c541a3269",
+            "chitname": "chit9",
+            "chitsize": 10,
+            "chitvalue": 99999,
+            "chitperiod": 10,
+            "__v": 0,
+            "chitendson": "05-03-2022",
+            "chitstarted": "06-05-2021",
+            "chitmonthsmore": 10,
+            "numberofmemberscanbeadded": 7,
+            "presentnumberofmembers": 3
+        },
+        {
+            "chitmembers": [
+                {
+                    "_id": "60912b3a86f5a57b478e6530",
+                    "membername": "mem_AAA",
+                    "memid": "mem_1"
+                },
+                {
+                    "_id": "6093919b14c7fbddf6badd30",
+                    "membername": "mem_BBB",
+                    "memid": "mem_2"
+                }
+            ],
+            "chitliftedby": [],
+            "chitpaidby": [],
+            "chitnotpaidby": [],
+            "_id": "609389227f609021c40e8586",
+            "chitname": "chit10",
+            "chitsize": 10,
+            "chitvalue": 10001010,
+            "chitperiod": 10,
+            "__v": 0,
+            "chitendson": "05-12-2021",
+            "chitstarted": "06-02-2021",
+            "chitmonthsmore": 7,
+            "numberofmemberscanbeadded": 8,
+            "presentnumberofmembers": 2
+        },
+        {
+            "chitmembers": [
+                {
+                    "_id": "60912b3a86f5a57b478e6530",
+                    "membername": "mem_AAA",
+                    "memid": "mem_1"
+                },
+                {
+                    "_id": "6093a3af4b9fe11eb81a7533",
+                    "membername": "mem_CCC",
+                    "memid": "mem_3"
+                }
+            ],
+            "chitliftedby": [],
+            "chitpaidby": [],
+            "chitnotpaidby": [],
+            "_id": "609389d8f373b92f18105337",
+            "chitname": "chit11",
+            "chitsize": 10,
+            "chitvalue": 11111,
+            "chitperiod": 10,
+            "__v": 0,
+            "chitendson": "05-03-2022",
+            "chitstarted": "06-05-2021",
+            "chitmonthsmore": 10,
+            "numberofmemberscanbeadded": 8,
+            "presentnumberofmembers": 2
+        },
+        {
+            "chitmembers": [
+                {
+                    "_id": "6093f2bdc00fa01c447bca28",
+                    "membername": "mem_DDD",
+                    "memid": "mem_4"
+                },
+                {
+                    "_id": "6093919b14c7fbddf6badd30",
+                    "membername": "mem_BBB",
+                    "memid": "mem_2"
+                },
+                {
+                    "_id": "6093a3af4b9fe11eb81a7533",
+                    "membername": "mem_CCC",
+                    "memid": "mem_3"
+                }
+            ],
+            "chitliftedby": [],
+            "chitpaidby": [],
+            "chitnotpaidby": [],
+            "_id": "60938c35e546c43858274ce0",
+            "chitname": "chit12",
+            "chitsize": 10,
+            "chitvalue": 1212,
+            "chitperiod": 10,
+            "__v": 0,
+            "chitendson": "05-03-2022",
+            "chitstarted": "06-05-2021",
+            "chitmonthsmore": 10,
+            "numberofmemberscanbeadded": 7,
+            "presentnumberofmembers": 3
+        },
+        {
+            "chitmembers": [
+                {
+                    "_id": "60912b3a86f5a57b478e6530",
+                    "membername": "mem_AAA",
+                    "memid": "mem_1"
+                },
+                {
+                    "_id": "6093a3af4b9fe11eb81a7533",
+                    "membername": "mem_CCC",
+                    "memid": "mem_3"
+                }
+            ],
+            "chitliftedby": [],
+            "chitpaidby": [],
+            "chitnotpaidby": [],
+            "_id": "60938dc0f56b4910a4ec6029",
+            "chitname": "chit13",
+            "chitsize": 10,
+            "chitvalue": 1333333,
+            "chitperiod": 10,
+            "__v": 0,
+            "chitendson": "05-03-2022",
+            "chitstarted": "06-05-2021",
+            "chitmonthsmore": 10,
+            "numberofmemberscanbeadded": 8,
+            "presentnumberofmembers": 2
+        },
+        {
+            "chitmembers": [
+                {
+                    "_id": "6093f2bdc00fa01c447bca28",
+                    "membername": "mem_DDD",
+                    "memid": "mem_4"
+                }
+            ],
+            "chitliftedby": [],
+            "chitpaidby": [],
+            "chitnotpaidby": [],
+            "_id": "60938e313c1c1a1fa0362ea4",
+            "chitname": "chit14",
+            "chitsize": 10,
+            "chitvalue": 144444,
+            "chitperiod": 10,
+            "__v": 0,
+            "chitendson": "05-03-2022",
+            "chitstarted": "06-05-2021",
+            "chitmonthsmore": 10,
+            "numberofmemberscanbeadded": 9,
+            "presentnumberofmembers": 1
+        },
+        {
+            "chitmembers": [],
+            "chitliftedby": [],
+            "chitpaidby": [],
+            "chitnotpaidby": [],
+            "_id": "60938eea67fc3e0a50e99863",
+            "chitname": "chit15",
+            "chitsize": 10,
+            "chitvalue": 151515,
+            "chitperiod": 10,
+            "__v": 0,
+            "chitendson": "05-03-2022",
+            "chitstarted": "06-05-2021",
+            "chitmonthsmore": 10
+        }
+    ]
+}

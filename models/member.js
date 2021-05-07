@@ -22,7 +22,6 @@ var memberschema = mongoose.Schema({
     memid:{
         type:String
     }
-    
 });
 // Export user model
 var memberuser = module.exports = mongoose.model('member', memberschema,'member');

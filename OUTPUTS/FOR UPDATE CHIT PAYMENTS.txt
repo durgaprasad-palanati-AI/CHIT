@@ -1,0 +1,42 @@
+{
+    "payload": {
+        "chitname": "chit10",
+        "chitpaidby": [
+            "mem_1",
+            "mem_7"
+        ]
+    },
+    "message": "chit payments success update",
+    "data": [
+        {
+            "chitmembers": [
+                {
+                    "_id": "60912b3a86f5a57b478e6530",
+                    "membername": "mem_AAA",
+                    "memid": "mem_1"
+                },
+                {
+                    "_id": "6093919b14c7fbddf6badd30",
+                    "membername": "mem_BBB",
+                    "memid": "mem_2"
+                }
+            ],
+            "chitliftedby": [],
+            "chitpaidby": [
+                "mem_1"
+            ],
+            "chitnotpaidby": [],
+            "_id": "609389227f609021c40e8586",
+            "chitname": "chit10",
+            "chitsize": 10,
+            "chitvalue": 10001010,
+            "chitperiod": 10,
+            "__v": 0,
+            "chitendson": "05-12-2021",
+            "chitstarted": "06-02-2021",
+            "chitmonthsmore": 7,
+            "numberofmemberscanbeadded": 8,
+            "presentnumberofmembers": 2
+        }
+    ]
+}

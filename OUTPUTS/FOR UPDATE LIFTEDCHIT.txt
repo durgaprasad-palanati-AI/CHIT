@@ -1,0 +1,50 @@
+{
+    "payload": {
+        "chitname": "chit15",
+        "chitliftedby": "mem_6"
+    },
+    "message": "success update",
+    "data": [
+        {
+            "chitmembers": [
+                {
+                    "_id": "6094e6e1ab10431850a286e1",
+                    "membername": "mem_FFF",
+                    "memid": "mem_6"
+                },
+                {
+                    "_id": "6094e6f0ab10431850a286e2",
+                    "membername": "mem_GGG",
+                    "memid": "mem_7"
+                }
+            ],
+            "chitliftedby": [
+                {
+                    "inthesechits": [
+                        "chit15"
+                    ],
+                    "liftedchits": [],
+                    "paidchits": [],
+                    "_id": "6094e6e1ab10431850a286e1",
+                    "membername": "mem_FFF",
+                    "memid": "mem_6",
+                    "__v": 0,
+                    "innumberofchits": 1
+                }
+            ],
+            "chitpaidby": [],
+            "chitnotpaidby": [],
+            "_id": "60938eea67fc3e0a50e99863",
+            "chitname": "chit15",
+            "chitsize": 10,
+            "chitvalue": 15555,
+            "chitperiod": 10,
+            "__v": 0,
+            "chitendson": "05-03-2022",
+            "chitstarted": "06-05-2021",
+            "chitmonthsmore": 10,
+            "numberofmemberscanbeadded": 8,
+            "presentnumberofmembers": 2
+        }
+    ]
+}
