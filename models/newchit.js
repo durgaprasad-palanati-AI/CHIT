@@ -15,6 +15,7 @@ var chitschema = mongoose.Schema({
     chitperiod:{
         type:Number
     },
+    payment:[{type:Object}],
     chitmonth:{
         type:Number
     },

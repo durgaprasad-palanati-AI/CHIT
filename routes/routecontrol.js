@@ -55,7 +55,13 @@ exports.createmembers= async function (req, res) {
 exports.viewmembers=function (req, res) {
     
    memberschema.get(async function (err, members) {
-                 if (err) {
+    try
+    { 
+        const role  = req.headers.role;
+
+        if(role=='owner')
+        {
+                    if (err) {
                              res.json({
                             status: "error",
                              message: err,
@@ -77,35 +83,94 @@ exports.viewmembers=function (req, res) {
                             data: memberis
                             });
                     }
+                }
+                else{
+                    res.json({message:"no job for u here"})
+                }}catch(err)
+                {
+                console.log(err)
+                res.json({message:"internal error"})
+                }
                     });  
                
 };
+//view member details monthly
+exports.viewmembers4=async function (req, res) {
+    try{
+        const {chitname,mem,month}=req.body
+        //console.log("memname=",chitname,mem,month)
+        const role  = req.headers.role;
+        if(role=='owner')
+        {
+        let paidmem=await chitschema.findOne({})
+        //console.log("found doc",paidmem.payment)
+        var memflag='no'
+        var paiddue=''
+        //get objects of array
+        for(let i=0;i<paidmem.payment.length;i++)
+        {
+            
+            if(paidmem.payment[i].month==month)
+            {
+                for(let j=0;j<paidmem.payment[i].paid_all.length;j++){
+                    //console.log("paidmem.payment[i].paid_all[j]",paidmem.payment[i].paid_all[j])
+                    if(paidmem.payment[i].paid_all[j].mem==mem){
+                        
+                       paiddue=paidmem.payment[i].paid_all[j].paid
+                       memflag='yes'
+                    }}
+        }}
+        if(memflag=='yes'){
+            res.json({message:"completed",membername:mem,Formonth:month,paid:paiddue})
+        }else{res.json({message:"member not found",membername:mem})}
+    }
+else{
+    res.json({message:"no job for u here"})
+}}catch(err)
+     {
+     console.log(err)
+     res.json({message:"internal error"})
+     }
+ };
 //view chits
-exports.viewallchits=function (req, res) {
-    
-    chitschema.get(async function (err, chits) {
-        if (err) {
+exports.viewallchits=async function (req, res) {
+    try
+    { 
+        const role  = req.headers.role;
+
+        if(role=='owner')
+        {
+         chitschema.get(async function (err, chits) {
+            if (err) {
             res.json({
                 status: "error",
                 message: err,
             });
-        }
-        else if(!req.body.chitname)
-        {res.json({
+                    }
+            else if(!req.body.chitname)
+            {res.json({
             //payload:req.body,
              status: "success",
             message: "chits retrieved successfully",
             data: chits
             });}
-            else{
+                else{
                 chitis= await chitschema.findOne({chitname:req.body.chitname})
-        res.json({
+                res.json({
             payload:req.body,
             status: "success",
             message: "chit retrieved successfully",
-            data: chitis
-        });}
-    });
+            data: chitis});}})
+            }
+        else{
+            res.json({message:"no job for u here"})
+        }
+    }
+        catch(err)
+        {
+        console.log(err)
+        res.json({message:"internal error"})
+        }
 };
 //create chits
 exports.createchit= async function (req, res) {
