@@ -14,7 +14,7 @@ var routecontroller = require('./routecontrol');
 router.post('/login',routecontroller.loggin);//
 router.get('/viewallchits',authentication.verifyToken,routecontroller.viewallchits);//
 router.get('/viewmembers',authentication.verifyToken,routecontroller.viewmembers);//
-router.get('/viewmembers4',authentication.verifyToken,routecontroller.viewmembers4);//
+router.get('/viewmemberhistory',authentication.verifyToken,routecontroller.viewmembers4);//
 router.put('/createmembers',authentication.verifyToken,routecontroller.createmembers);//
 router.put('/createchit',authentication.verifyToken,routecontroller.createchit);//
 router.post('/updatechit',authentication.verifyToken,routecontroller.updatechit);//

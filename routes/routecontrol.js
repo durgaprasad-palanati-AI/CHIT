@@ -106,22 +106,42 @@ exports.viewmembers4=async function (req, res) {
         //console.log("found doc",paidmem.payment)
         var memflag='no'
         var paiddue=''
+        var payhist=[]
         //get objects of array
-        for(let i=0;i<paidmem.payment.length;i++)
-        {
+        
             
-            if(paidmem.payment[i].month==month)
+            if(month!=null)
             {
+                for(let i=0;i<paidmem.payment.length;i++)
+                {
+                    if (paidmem.payment[i].month==month){
                 for(let j=0;j<paidmem.payment[i].paid_all.length;j++){
                     //console.log("paidmem.payment[i].paid_all[j]",paidmem.payment[i].paid_all[j])
                     if(paidmem.payment[i].paid_all[j].mem==mem){
                         
                        paiddue=paidmem.payment[i].paid_all[j].paid
                        memflag='yes'
-                    }}
-        }}
+                    }}}
+                }
+        }else if(month==null){
+             var monpay=''
+                  for(let i=0;i<paidmem.payment.length;i++)  {//paidmem.payment.length
+                    for(let j=0;j<paidmem.payment[i].paid_all.length;j++){
+                        //console.log("paidmem.payment[i].paid_all[j]",paidmem.payment[i].paid_all[j])
+                        if(paidmem.payment[i].paid_all[j].mem==mem){
+                            paiddue=paidmem.payment[i].paid_all[j].paid
+                           memflag='yes'
+                        }} 
+                        monpay="for the month "+paidmem.payment[i].month+" payment is "+paiddue
+                        payhist.push(monpay)         
+                    }
+        }
         if(memflag=='yes'){
-            res.json({message:"completed",membername:mem,Formonth:month,paid:paiddue})
+            if(month!=null){
+            res.json({message:"completed",membername:mem,Formonth:month,paid:paiddue})}
+            else{
+                res.json({message:"completed",membername:mem,paymenthistory:payhist}) 
+            }
         }else{res.json({message:"member not found",membername:mem})}
     }
 else{
