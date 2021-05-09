@@ -207,28 +207,21 @@ exports.updatechit =async function (req, res) {
     { const {chitname,chitvalue,chitmems}=req.body
     const role  = req.headers.role;
     if(role=='owner'){
-     chit= await chitschema.find({chitname:chitname})
+       chit= await chitschema.find({chitname:chitname})
      //console.log("found chit",chit)
     if(!chit.length)
-    {
-        res.json({message:"no chit found with given:"+chitname})
-    }
+    {res.json({message:"no chit found with given:"+chitname})    }
     else
-    {
-        
-        chito= await chitschema.findOne({chitname:chitname})
+    {  chito= await chitschema.findOne({chitname:chitname})
         var curtime=moment().format("DD-MM-YYYY")
         let cmore=ddif.moretime(curtime,chito.chitendson)
         var membs=[]
         var vmembs=[]
         for(let i = 0, l = chitmems.length; i < l; i++) 
-        {
-            mems=await memberschema.findOne({memid:chitmems[i]},{membername:1,memid:1})
-           
-             if(!mems)
-            {
-            // 
-             }
+        { mems=await memberschema.findOne({memid:chitmems[i]},{membername:1,memid:1})
+           if(!mems)
+            {//
+            }
             else{
              membs.push(mems.memid)
              vmembs.push(mems)
@@ -241,36 +234,48 @@ exports.updatechit =async function (req, res) {
          else
          {  //add member to chit
             let chit= await  chitschema.findOne({chitname:chitname})
-            //console.log("chit size=",chit.chitsize)
-            more=chit.chitsize-vmembs.length
+            if (chit.chitmembers==undefined){
+                chit.chitmembers=[]
+                more=chit.chitsize-chit.chitmembers.length
+            }
+            else{more=chit.chitsize-chit.chitmembers.length}
+            
+            if(vmembs.length<=more){
+                console.log("more=",more)          
+                for (let i=0;i<vmembs.length;i++)
+                        {chit.chitmembers.push(vmembs[i])}
+            if ((chit.presentnumberofmembers==undefined) || (chit.presentnumberofmembers<chit.chitsize) )
+            {
+                more=chit.chitsize-chit.chitmembers.length
             let updatedchit = await chitschema.findOneAndUpdate({chitname:chitname},
-            {$set: {chitvalue: chitvalue,chitmonthsmore: cmore,chitmembers:vmembs,
-                presentnumberofmembers:vmembs.length,
+            {$set: {chitvalue: chitvalue,chitmonthsmore: cmore,chitmembers:chit.chitmembers,
+                presentnumberofmembers:chit.chitmembers.length,
                 numberofmemberscanbeadded:more}})
+                
                        
             let difference = chitmems.filter(x => !membs.includes(x));
             //add chit to member
             for(let i = 0, l = membs.length; i < l; i++) 
-            { 
-            let updatedmember = await memberschema.findOneAndUpdate({memid:membs[i]},
-                {$push: {inthesechits:chitname}})
-             }
-            
+            { let updatedmember = await memberschema.findOneAndUpdate({memid:membs[i]},
+                {$push: {inthesechits:chitname}})}
             const updatedmember2=memberschema.find().cursor();
             for (let doc = await updatedmember2.next(); doc != null; doc = await updatedmember2.next())
-             {
-                //console.log("doc is=",doc.inthesechits,doc.inthesechits.length)
-                let updatedmember3 = await memberschema.findOneAndUpdate({memid:doc.memid},
-                    {$set: {innumberofchits:doc.inthesechits.length}})  
-            } 
+             {let updatedmember3 = await memberschema.findOneAndUpdate({memid:doc.memid},
+                    {$set: {innumberofchits:doc.inthesechits.length}})} 
             let chitu= await  chitschema.findOne({chitname:chitname})  
             res.json({payload:req.body,message:"success update",notmembers:difference,data:chitu})
             }
-    }     
- }else{
-    res.json({message:"no job for u here"})
-}
-     }catch(err)
+        }
+        else{
+            del=vmembs.length-more
+            if(del==1)
+            {
+                res.json({chit:chitname,message:"chit capacity reached"})}
+                else{ res.json({chit:chitname,message:"chit capacity is not sufficient delete any "+del+"  member(s)"})}
+        } 
+     }}
+     }else{res.json({message:"no job for u here"})}
+    }catch(err)
      {
      console.log(err)
      res.json({message:"internal error"})
