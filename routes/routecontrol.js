@@ -10,6 +10,7 @@ const authentication = new Authentication();
 const ddiff = require("./datediffunction");
 const ddif = new ddiff();
 var moment = require('moment');
+const { response } = require('express');
 
 exports.loggin=async function (req, res) {
     const { username, password,role } = req.body;
@@ -108,9 +109,7 @@ exports.viewmembers4=async function (req, res) {
         var paiddue=''
         var payhist=[]
         //get objects of array
-        
-            
-            if(month!=null)
+         if(month!=null)
             {
                 for(let i=0;i<paidmem.payment.length;i++)
                 {
@@ -222,14 +221,13 @@ exports.createchit= async function (req, res) {
      }
 };
 //update chit
-exports.updatechit =async function (req, res) {
+exports.addmembertochit =async function (req, res) {
     try
-    { const {chitname,chitvalue,chitmems}=req.body
+    { const {chitname,chitmems}=req.body
     const role  = req.headers.role;
     if(role=='owner'){
        chit= await chitschema.find({chitname:chitname})
-     //console.log("found chit",chit)
-    if(!chit.length)
+     if(!chit.length)
     {res.json({message:"no chit found with given:"+chitname})    }
     else
     {  chito= await chitschema.findOne({chitname:chitname})
@@ -268,12 +266,10 @@ exports.updatechit =async function (req, res) {
             {
                 more=chit.chitsize-chit.chitmembers.length
             let updatedchit = await chitschema.findOneAndUpdate({chitname:chitname},
-            {$set: {chitvalue: chitvalue,chitmonthsmore: cmore,chitmembers:chit.chitmembers,
+            {$set: {chitmonthsmore: cmore,chitmembers:chit.chitmembers,
                 presentnumberofmembers:chit.chitmembers.length,
                 numberofmemberscanbeadded:more}})
-                
-                       
-            let difference = chitmems.filter(x => !membs.includes(x));
+          let difference = chitmems.filter(x => !membs.includes(x));
             //add chit to member
             for(let i = 0, l = membs.length; i < l; i++) 
             { let updatedmember = await memberschema.findOneAndUpdate({memid:membs[i]},
@@ -305,7 +301,7 @@ exports.updatechit =async function (req, res) {
  
 exports.updatechitpayments =async function (req, res) {
     try
-    { const {chitname,chitpaidby}=req.body
+    { const {chitname,chitmonth,chitpaidby}=req.body
     const role  = req.headers.role;
     if(role=='owner'){
      chit= await chitschema.find({chitname:chitname})
@@ -319,7 +315,7 @@ exports.updatechitpayments =async function (req, res) {
     else
     {   
         let chitmember2=await chitschema.findOne({chitname:chitname})
-       
+       const chitinst=chitmember2.chitvalue/chitmember2.chitsize//chit installment
        vchitmembers=chitmember2.chitmembers
        var vchitmembs=[]
        for(let i=0;i<vchitmembers.length;i++)
@@ -331,24 +327,50 @@ exports.updatechitpayments =async function (req, res) {
        //console.log("chit paid vmebs",vmembs)
         if(!vmembs.length)
             { 
-            res.json({message:"these members not allowedto pay:"+chitliftedby})
+                console.log("invalid members")
+            res.json({message:"these members not allowed to pay:"+chitpaidby})
             }      
          else
             {  
-            let updatedchit = await chitschema.findOneAndUpdate({chitname:chitname},
-            {$set: {chitpaidby:vmembs}})    
+            
+            // var updatedchit = 
+            if(chitmember2.payment==undefined || chitmember2.payment.length==0)
+            {
+                var paidinst=chitinst*vmembs.length
+                console.log("chitmember2.payment",chitmember2.payment)
+            await chitschema.findOneAndUpdate({chitname:chitname},
+            {$push:{"payment":{month:chitmonth,paid_all:[{mem:vmembs[0],paid:'yes'}]},
+            "chitpaymentdetails":[{month:chitmonth,payment:paidinst}]}})
+            for (i=0;i<vmembs.length;i++){
+                                
+                let updatedmember3 = await memberschema.findOneAndUpdate({memid:vmembs[i]},
+                    {$set: {paidchits:chitname}})
+                }
+            res.json({message:"chit payments success update",data:chit})
             }
-        
-    }  
-    
-    for (i=0;i<chitpaidby.length;i++){
-    let updatedmember3 = await memberschema.findOneAndUpdate({memid:chitpaidby[i]},
-        {$set: {paidchits:chit}})}
-        chit= await chitschema.find({chitname:chitname})
- res.json({payload:req.body,message:"chit payments success update",data:chit})
-    }
-   
-  else{res.json({message:"no job for u here"})}
+            else{
+                
+                for(let i=0;i<chitmember2.chitperiod;i++)
+                {  if(chitmember2.payment[i]!=undefined){ 
+                    if(chitmember2.payment[i].month==chitmonth && chitmember2.payment[i].paid_all.length<chitmember2.chitsize)
+                    {
+                        for (let j=0;j<vmembs.length;j++){
+                      chitmember2.payment[i].paid_all.push({mem:vmembs[j],paid:'yes'})}
+                      
+                      var paidinst=chitinst*chitmember2.payment[i].paid_all.length
+                      chitmember2.chitpaymentdetails[i].payment=paidinst
+                        await chitschema.findOneAndUpdate({chitname:chitname},
+                            {$set:{payment:chitmember2.payment,chitpaymentdetails:chitmember2.chitpaymentdetails[i]}})
+                            for (i=0;i<vmembs.length;i++){         
+                                await memberschema.findOneAndUpdate({memid:vmembs[i]},
+                                    {$set: {paidchits:chitname}})}
+                            res.json({message:"chit payments success update"})  
+                    } else{res.json({message:"chit payments already done"})}
+                }}
+                /*  */
+                                        
+            }}}}
+    else{res.json({message:"no job for u here"})}
      }
      catch(err)
      {
@@ -391,6 +413,50 @@ exports.updateliftedchit =async function (req, res) {
  }  else{res.json({message:"no job for u here"})}
      }
      catch(err)
+     {
+     console.log(err)
+     res.json({message:"internal error"})
+     }
+ };
+ exports.modifychit =async function (req, res) {
+    try
+    { const {chitname,op,opvalue}=req.body
+    const role  = req.headers.role;
+    if(role=='owner'){
+       chit= await chitschema.find({chitname:chitname})
+     if(!chit.length)
+    {res.json({message:"no chit found with given:"+chitname})    }
+    else
+    { if(op=='CHIT VALUE')
+    {
+       //CHANGE chit value 
+       let updatedchit = await chitschema.findOneAndUpdate({chitname:chitname},
+        {$set: {chitvalue:opvalue}})
+        let chitu= await  chitschema.findOne({chitname:chitname})  
+            res.json({message:"success update",data:chitu})
+
+    }else if(op=='CHIT SIZE')
+    {
+        //CHANGE CHIT SIZE
+        let updatedchit = await chitschema.findOneAndUpdate({chitname:chitname},
+            {$set: {chitsize:opvalue}})
+            let chitu= await  chitschema.findOne({chitname:chitname})  
+                res.json({message:"success update",data:chitu})
+    }else if(op=='CHIT PERIOD')
+    {
+        //CHANGE CHIT PERIOD
+        let updatedchit = await chitschema.findOneAndUpdate({chitname:chitname},
+            {$set: {chitperiod:opvalue}})
+            let chitu= await  chitschema.findOne({chitname:chitname})  
+                res.json({message:"success update",data:chitu})
+    }
+    else{
+        res.json({message:"no input for modifications"})
+    }
+
+    }
+}else{res.json({message:"no job for u here"})}
+    }catch(err)
      {
      console.log(err)
      res.json({message:"internal error"})

@@ -17,9 +17,10 @@ router.get('/viewmembers',authentication.verifyToken,routecontroller.viewmembers
 router.get('/viewmemberhistory',authentication.verifyToken,routecontroller.viewmembers4);//
 router.put('/createmembers',authentication.verifyToken,routecontroller.createmembers);//
 router.put('/createchit',authentication.verifyToken,routecontroller.createchit);//
-router.post('/updatechit',authentication.verifyToken,routecontroller.updatechit);//
+router.post('/addmembertochit',authentication.verifyToken,routecontroller.addmembertochit);//
 router.post('/updatechitpayments',authentication.verifyToken,routecontroller.updatechitpayments);//
 router.post('/updateliftedchit',authentication.verifyToken,routecontroller.updateliftedchit);//
+router.post('/modifychit',authentication.verifyToken,routecontroller.modifychit);
 router.delete('/deletechit',authentication.verifyToken,routecontroller.deletechit);
 
 module.exports = router ;
