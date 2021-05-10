@@ -422,16 +422,31 @@ exports.updateliftedchit =async function (req, res) {
          else
             {  //add member to chit
             let chit= await  chitschema.findOne({chitname:chitname})
-            //console.log("chit size=",chit.chitsize)
-            
+            var chitm=[]
+            var chitl=[]
+                for(let i=0;i<chit.chitmembers.length;i++){
+                    chitm.push(chit.chitmembers[i].mem_id)
+                }
+                for(let i=0;i<chit.chitliftedby.length;i++){
+                    chitl.push(chit.chitliftedby[i].mem_id)
+                }
+
+            if(chitm.includes(chitliftedby) || !chitl.includes(chitliftedby)){            
             let updatedchit = await chitschema.findOneAndUpdate({chitname:chitname},
             {$set: {chitliftedby:mems}})    
             }
-        
-    }  
-    chit= await chitschema.find({chitname:chitname})
-    let updatedmember3 = await memberschema.findOneAndUpdate({memid:chitliftedby},
-        {$set: {liftedchits:chit}})
+            else{
+                res.json({message:"this member not in chit"})}
+            }
+       }  
+    chit= await chitschema.findOne({chitname:chitname})
+    const chitinst=(chit.chitvalue/chit.chitsize)+1000
+    
+    let updatedmember3 = await memberschema.findOne({memid:chitliftedby})
+    updatedmember3.chitinst.push({chitname:chitname,inst:chitinst})
+    
+    await memberschema.findOneAndUpdate({memid:chitliftedby},
+        {$set: {liftedchits:chit,chitinst:updatedmember3.chitinst}})
     res.json({payload:req.body,message:"success update",data:chit})  
  }  else{res.json({message:"no job for u here"})}
      }

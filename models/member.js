@@ -17,6 +17,8 @@ var memberschema = mongoose.Schema({
     liftedchits:
         [{ type: Object, ref: 'newchit' }]
     ,
+    chitinst:
+    [{ type: Object}],
     paidchits:
         [{ type: Object, ref: 'newchit' }],
     memid:{
