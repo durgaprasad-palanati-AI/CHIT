@@ -96,20 +96,40 @@ exports.viewmembers=function (req, res) {
                
 };
 //view member details monthly
-exports.viewmembers4=async function (req, res) {
+exports.viewmembershistory=async function (req, res) {
     try{
         const {chitname,mem,month}=req.body
         //console.log("memname=",chitname,mem,month)
         const role  = req.headers.role;
         if(role=='owner')
         {
-        let paidmem=await chitschema.findOne({})
-        //console.log("found doc",paidmem.payment)
+        let paidmem=await chitschema.findOne({chitname:chitname})
+        
         var memflag='no'
         var paiddue=''
         var payhist=[]
         //get objects of array
-         if(month!=null)
+        if(chitname==null && month==null && mem!=null){
+
+            let chitall=await chitschema.find({}).cursor();
+            for (let doc = await chitall.next(); doc != null; doc = await chitall.next())
+             {
+                var monpay=''
+                for(let i=0;i<doc.payment.length;i++)  {//paidmem.payment.length
+                  for(let j=0;j<doc.payment[i].paid_all.length;j++){
+                      
+                      if(doc.payment[i].paid_all[j].mem==mem){
+                          paiddue=doc.payment[i].paid_all[j].paid
+                          memflag='yes'
+                         }} 
+                      monpay="for the chit="+doc.chitname+"-for the month="+doc.payment[i].month+"- payment is="+paiddue
+                      payhist.push(monpay)         
+                  }
+
+             }
+
+        }
+         else if(chitname!=null && month!=null)
             {
                 for(let i=0;i<paidmem.payment.length;i++)
                 {
@@ -122,7 +142,7 @@ exports.viewmembers4=async function (req, res) {
                        memflag='yes'
                     }}}
                 }
-        }else if(month==null){
+        }else if(chitname!=null && month==null){
              var monpay=''
                   for(let i=0;i<paidmem.payment.length;i++)  {//paidmem.payment.length
                     for(let j=0;j<paidmem.payment[i].paid_all.length;j++){
@@ -133,13 +153,16 @@ exports.viewmembers4=async function (req, res) {
                         }} 
                         monpay="for the month "+paidmem.payment[i].month+" payment is "+paiddue
                         payhist.push(monpay)         
-                    }
-        }
+                    } }
         if(memflag=='yes'){
-            if(month!=null){
+            if(chitname!=null && month!=null){
             res.json({message:"completed",membername:mem,Formonth:month,paid:paiddue})}
-            else{
+            else if(chitname!=null && month==null){
                 res.json({message:"completed",membername:mem,paymenthistory:payhist}) 
+            }
+            else if(chitname==null && month==null && mem!=null){
+                res.json({message:"completed",membername:mem,paymenthistory:payhist}) 
+
             }
         }else{res.json({message:"member not found",membername:mem})}
     }
@@ -423,32 +446,93 @@ exports.updateliftedchit =async function (req, res) {
     { const {chitname,op,opvalue}=req.body
     const role  = req.headers.role;
     if(role=='owner'){
-       chit= await chitschema.find({chitname:chitname})
-     if(!chit.length)
-    {res.json({message:"no chit found with given:"+chitname})    }
+       chit= await chitschema.findOne({chitname:chitname})
+     if(!chit)
+    {res.json({message:"no chit found with given:"+chitname})}
     else
     { if(op=='CHIT VALUE')
-    {
+        {
        //CHANGE chit value 
        let updatedchit = await chitschema.findOneAndUpdate({chitname:chitname},
         {$set: {chitvalue:opvalue}})
         let chitu= await  chitschema.findOne({chitname:chitname})  
             res.json({message:"success update",data:chitu})
 
-    }else if(op=='CHIT SIZE')
+        }
+        else if(op=='CHIT SIZE')
     {
-        //CHANGE CHIT SIZE
+        if(chit.chitmembers.length<=opvalue)
+        {//CHANGE CHIT SIZE
+        more=opvalue-chit.chitmembers.length
         let updatedchit = await chitschema.findOneAndUpdate({chitname:chitname},
-            {$set: {chitsize:opvalue}})
+            {$set: {chitsize:opvalue,presentnumberofmembers:chit.chitmembers.length,
+                numberofmemberscanbeadded:more}})
             let chitu= await  chitschema.findOne({chitname:chitname})  
                 res.json({message:"success update",data:chitu})
+            }else{
+                res.json({message:"not allowed to update size",members:chit.chitmembers.length,updatesizevalue:opvalue})
+            }
+
     }else if(op=='CHIT PERIOD')
     {
         //CHANGE CHIT PERIOD
+        if(chit.chitpaymentdetails.length==0)
+        {
+        var cetime=moment().add(opvalue, 'M').subtract(1,'d').format('DD-MM-YYYY');
         let updatedchit = await chitschema.findOneAndUpdate({chitname:chitname},
-            {$set: {chitperiod:opvalue}})
+            {$set: {chitperiod:opvalue,chitendson:cetime}})
             let chitu= await  chitschema.findOne({chitname:chitname})  
                 res.json({message:"success update",data:chitu})
+        }else{
+            res.json({message:"not allowed to update now because chit payments done already"})
+        }
+    }
+    else{
+        res.json({message:"no input for modifications"})
+    }
+
+    }
+}else{res.json({message:"no job for u here"})}
+    }catch(err)
+     {
+     console.log(err)
+     res.json({message:"internal error"})
+     }
+ };
+ exports.getchitinfo =async function (req, res) {
+    try
+    { const {chitname,op}=req.body
+    const role  = req.headers.role;
+    if(role=='owner'){
+       chit= await chitschema.findOne({chitname:chitname})
+     if(!chit)
+    {res.json({message:"no chit found with given:"+chitname})    }
+    else
+    { if(op=='CHIT VALUE')
+    {
+       //view chit value 
+
+        let chitv= await  chitschema.findOne({chitname:chitname},{chitvalue:1})  
+            res.json({message:"success",data:chitv})
+
+    }else if(op=='CHIT SIZE')
+    {
+        //view CHIT SIZE
+            let chitu= await  chitschema.findOne({chitname:chitname},{chitsize:1})  
+                res.json({message:"success",data:chitu})
+    }else if(op=='CHIT PERIOD')
+    {
+        //view CHIT PERIOD
+            let chitu= await  chitschema.findOne({chitname:chitname},{chitperiod:1,chitstarted:1,
+            chitendson:1,chitmonth:1,chitmonthsmore:1})
+                res.json({message:"success",data:chitu})
+    }else if(chitname!=null && op==null){
+        let chitu= await  chitschema.findOne({chitname:chitname})  
+                res.json({message:"success",data:chitu})
+    }else if(op=='chit payments'){
+        let chitu= await  chitschema.findOne({chitname:chitname},{chitpaymentdetails:1,payment:1})  
+                chitdue=chit.chitvalue-chitu.chitpaymentdetails[0].payment
+        res.json({message:"success",data:chitu,chitdue:chitdue})
     }
     else{
         res.json({message:"no input for modifications"})
