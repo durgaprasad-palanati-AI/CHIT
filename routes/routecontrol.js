@@ -59,7 +59,6 @@ exports.viewmembers=function (req, res) {
     try
     { 
         const role  = req.headers.role;
-
         if(role=='owner')
         {
                     if (err) {
@@ -68,7 +67,9 @@ exports.viewmembers=function (req, res) {
                              message: err,
                             });
                         }
-                    else if(!req.body.memid)
+                    else if(members.length>0)
+                    {
+                        if(!req.body.memid)
                         {res.json({
                             //payload:req.body,
                              status: "success",
@@ -78,11 +79,16 @@ exports.viewmembers=function (req, res) {
                     else{
                         memberis= await memberschema.findOne({memid:req.body.memid})
                         res.json({
-                            payload:req.body,
                              status: "success",
                             message: "member retrieved successfully",
                             data: memberis
-                            });
+                            });}
+                    }
+                    else{
+                        res.json({
+                           message: "members not yet created"
+                           });
+
                     }
                 }
                 else{
@@ -165,7 +171,7 @@ exports.viewmembershistory=async function (req, res) {
 
             }
         }else{res.json({message:"member not found",membername:mem})}
-    }
+    }//
 else{
     res.json({message:"no job for u here"})
 }}catch(err)
@@ -189,20 +195,61 @@ exports.viewallchits=async function (req, res) {
                 message: err,
             });
                     }
-            else if(!req.body.chitname)
-            {res.json({
-            //payload:req.body,
-             status: "success",
-            message: "chits retrieved successfully",
-            data: chits
-            });}
-                else{
+            else if(chits.length>0)
+            {
+            if(!req.body.chitname)
+            {res.json({status: "success",message: "chits retrieved successfully",
+            data: chits});
+            }
+            else{
                 chitis= await chitschema.findOne({chitname:req.body.chitname})
-                res.json({
-            payload:req.body,
-            status: "success",
-            message: "chit retrieved successfully",
-            data: chitis});}})
+                res.json({status: "success",message: "chit retrieved successfully",
+                            data: chitis});
+                        }
+                    }else{res.json({message: "no chits created till now"})}
+                })
+            }
+            else{
+            res.json({message:"no job for u here"})
+        }
+    }
+        catch(err)
+        {
+        console.log(err)
+        res.json({message:"internal error"})
+        }
+};
+exports.viewallactivechits=async function (req, res) {
+    try
+    { 
+        const role  = req.headers.role;
+
+        if(role=='owner')
+        {
+         chitschema.get(async function (err, chits) {
+            if (err) {
+            res.json({
+                status: "error",
+                message: err,
+            });
+            }
+            
+            else if(chits.length>0)
+            {
+                if(!req.body.status)
+                {
+                    chits= await chitschema.findOne({status:req.body.status})
+                    res.json({status: "success",message: "active chits are retrieved successfully",
+                    data: chits});
+                }
+                    else{
+                    chitis= await chitschema.findOne({chitname:req.body.chitname,status:req.body.status})
+                    res.json({status: "success",
+                                message: "active chit is retrieved successfully",
+                                data: chitis});
+                            }}
+            else{res.json({message: "no chits created till now"});}
+            })
             }
         else{
             res.json({message:"no job for u here"})
@@ -223,8 +270,8 @@ exports.createchit= async function (req, res) {
         if(role=='owner')
         {
         const newchit = req.body;
-        //console.log(newchit)
-        //console.log(newchit.chitname,newchit.chitvalue)
+        console.log(newchit)
+        console.log(newchit.chitname,newchit.status,newchit.chitvalue)
         chitschema.create(newchit);
         var cstime=moment().format("DD-MM-YYYY")
         var cetime=moment().add(newchit.chitperiod, 'M').subtract(1,'d').format('DD-MM-YYYY');
@@ -574,7 +621,10 @@ exports.updateliftedchit =async function (req, res) {
         res.json({message:"no chit found with given:"+chitname})
     }
     else{
-      await chitschema.findOneAndDelete({chitname:chitname})
+      //await chitschema.findOneAndDelete({chitname:chitname}) //deletes chit
+                    /////////// without deletion//////////////////
+      await chitschema.findOneAndUpdate({chitname:chitname},
+        {$set: {status:"inactive"}})
          
       //DELETE CHIT FROM MEMBERS WHO ARE HOLDING IT
         const dmembs=[]//to delete deleted chit from these mebers
@@ -586,10 +636,8 @@ exports.updateliftedchit =async function (req, res) {
                 dmembs.push(doc.memid)
                 }
             } 
-            //console.log("dmembs is=",dmembs)
-        for(let i=0;i<dmembs.length;i++){
             
-            //console.log("dmebs is=",dmembs[i])
+        for(let i=0;i<dmembs.length;i++){
             const holdingchit=await memberschema.findOne({memid:dmembs[i]});
             const holdingchits=holdingchit.inthesechits
             //console.log("holdingchits inthese",holdingchits)
