@@ -1,0 +1,24 @@
+"payment": [
+            {
+                "month": "jan",
+                "paid_all": [
+                    {
+                        "mem": "mem_8",
+                        "paid": "yes"
+                    },
+                    {
+                        "mem": "mem_10",
+                        "paid": "yes"
+                    }            ]
+            }
+        ],
+        "chitpaymentdetails": [
+            {
+                "month": "jan",
+                "payment": 10000
+            }
+        ],
+        "_id": "60938e313c1c1a1fa0362ea4"
+    },
+    "chitdue": 0
+}

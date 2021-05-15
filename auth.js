@@ -15,7 +15,7 @@ class Authentication{
     
     verifyToken(req, res, next){
         try{
-            //console.log('req is=',req)
+            
             const authHeader = req.headers.authorization;
             const token = authHeader.split(' ')[1];
             //console.log("token is",token)

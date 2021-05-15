@@ -13,6 +13,7 @@ var routecontroller = require('./routecontrol');
 
 router.post('/login',routecontroller.loggin);//
 router.get('/viewallchits',authentication.verifyToken,routecontroller.viewallchits);//
+router.get('/viewallactivechits',authentication.verifyToken,routecontroller.viewallactivechits);//
 router.get('/viewmembers',authentication.verifyToken,routecontroller.viewmembers);//
 router.get('/viewmemberhistory',authentication.verifyToken,routecontroller.viewmembershistory);//
 router.put('/createmembers',authentication.verifyToken,routecontroller.createmembers);//

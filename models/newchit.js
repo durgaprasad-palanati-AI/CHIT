@@ -5,7 +5,7 @@ var chitschema = mongoose.Schema({
     chitname:{
         type:String
     },
-
+    status:{type:String},
     chitsize: {
         type:Number
     },

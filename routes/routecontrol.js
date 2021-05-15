@@ -329,7 +329,7 @@ exports.addmembertochit =async function (req, res) {
             else{more=chit.chitsize-chit.chitmembers.length}
             
             if(vmembs.length<=more){
-                console.log("more=",more)          
+                //console.log("more=",more)          
                 for (let i=0;i<vmembs.length;i++)
                         {chit.chitmembers.push(vmembs[i])}
             if ((chit.presentnumberofmembers==undefined) || (chit.presentnumberofmembers<chit.chitsize) )
